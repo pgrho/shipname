@@ -223,6 +223,17 @@ namespace Shipwreck.Svg
             element.SetAttributeValue("d", tci.ToString());
         }
 
+        public override void Scale(float scaleX, float scaleY)
+        {
+            if (_D != null)
+            {
+                foreach (var c in _D)
+                {
+                    c.Scale(scaleX, scaleY);
+                }
+            }
+        }
+
         public override void Translate(float x, float y)
         {
             if (_D != null)

@@ -16,7 +16,7 @@ namespace Shipwreck.ShipNameFont.Cli
         {
             var d = new Uri(new Uri(typeof(Program).Assembly.Location), @"../../../../jmsdf/").LocalPath;
 
-            var e = SvgElement.Parse(Path.Combine(d, "__all.svg"));
+            var e = SvgElement.LoadFile(Path.Combine(d, "__all.svg"));
 
             var rects = e.Descendants("rect").OfType<SvgRectElement>().Where(_ => _.Width * _.Height > 5000).ToArray();
 

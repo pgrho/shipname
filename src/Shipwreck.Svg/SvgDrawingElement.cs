@@ -9,6 +9,13 @@ using System.Xml.Linq;
 
 namespace Shipwreck.Svg
 {
+    public enum StrokeLocaltion
+    {
+        Center = 0,
+        Outside = 1,
+        Inside = 2
+    }
+
     public abstract class SvgDrawingElement : SvgElement
     {
         public string Fill { get; set; }
@@ -16,6 +23,8 @@ namespace Shipwreck.Svg
         public string Stroke { get; set; }
 
         public float StrokeWidth { get; set; }
+
+        public StrokeLocaltion StrokeLocaltion { get; set; }
 
         protected static void Parse(SvgDrawingElement element, XmlReader reader)
         {
@@ -25,6 +34,19 @@ namespace Shipwreck.Svg
             float f;
             float.TryParse(reader.GetAttribute("stroke-width"), out f);
             element.StrokeWidth = f;
+
+            switch ((reader.GetAttribute("stroke-location") ?? string.Empty).ToLower())
+            {
+                case "center":
+                    element.StrokeLocaltion = StrokeLocaltion.Center;
+                    break;
+                case "outside":
+                    element.StrokeLocaltion = StrokeLocaltion.Outside;
+                    break;
+                case "inside":
+                    element.StrokeLocaltion = StrokeLocaltion.Inside;
+                    break;
+            }
         }
 
         public override void CopyTo(SvgElement other)
@@ -35,6 +57,7 @@ namespace Shipwreck.Svg
             e.Fill = Fill;
             e.Stroke = Stroke;
             e.StrokeWidth = StrokeWidth;
+            e.StrokeLocaltion = StrokeLocaltion;
         }
 
         protected override void SetAttributes(XElement element)
@@ -42,9 +65,21 @@ namespace Shipwreck.Svg
             base.SetAttributes(element);
 
             element.SetAttributeValue("fill", Fill == "#000000" ? null : Fill ?? "none");
-            element.SetAttributeValue("stroke", Stroke == "#000000" ? null : Stroke ?? "none");
-            element.SetAttributeValue("stroke-width", Stroke == null || StrokeWidth <= 0 ? (float?)null : StrokeWidth);
+            if (Stroke == null || StrokeWidth <= 0)
+            {
+                element.SetAttributeValue("stroke", "none");
+                element.SetAttributeValue("stroke-width", null);
+            }
+            else
+            {
+                element.SetAttributeValue("stroke", Stroke);
+                element.SetAttributeValue("stroke-width", StrokeWidth);
+            }
+
+            element.SetAttributeValue("stroke-location", StrokeLocaltion == StrokeLocaltion.Center ? null : StrokeLocaltion.ToString().ToLower());
         }
+
+        public abstract void Scale(float scaleX, float scaleY);
 
         public abstract void Translate(float x, float y);
     }

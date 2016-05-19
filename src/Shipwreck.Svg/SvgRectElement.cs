@@ -71,5 +71,13 @@ namespace Shipwreck.Svg
             X += x;
             Y += y;
         }
+
+        public override void Scale(float scaleX, float scaleY)
+        {
+            X *= scaleX;
+            Y *= scaleY;
+            Width *= scaleX;
+            Height *= scaleY;
+        }
     }
 }

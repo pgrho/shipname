@@ -140,6 +140,10 @@ namespace Shipwreck.Svg
             element.SetAttributeValue("points", string.Join(" ", Points.Select(p => $"{p.X},{p.Y}")));
         }
 
+        public override void Scale(float scaleX, float scaleY)
+        {
+            Points = _Points?.Select(p => new Point(p.X * scaleX, p.Y * scaleY)).ToArray();
+        }
         public override void Translate(float x, float y)
         {
             Points = _Points?.Select(p => new Point(p.X + x, p.Y + y)).ToArray();

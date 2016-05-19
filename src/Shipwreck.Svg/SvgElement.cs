@@ -22,6 +22,8 @@ namespace Shipwreck.Svg
         public List<SvgElement> Items
             => _Items ?? (_Items = new List<SvgElement>());
 
+        public Rectangle ChildBounds => this.Descendants().Aggregate(Rectangle.NaN, (r, n) => r.IsNaN ? n.Bounds : n.Bounds.IsNaN ? r : r.UnionWith(n.Bounds));
+
         public abstract Rectangle Bounds { get; }
 
         public virtual void AddChild(SvgElement element)
@@ -89,7 +91,7 @@ namespace Shipwreck.Svg
         {
         }
 
-        public static SvgElement Parse(string fileName)
+        public static SvgElement LoadFile(string fileName)
         {
             var elems = new Stack<SvgElement>();
 
@@ -100,36 +102,7 @@ namespace Shipwreck.Svg
                     switch (xr.NodeType)
                     {
                         case XmlNodeType.Element:
-                            SvgElement ne;
-                            switch (xr.Name)
-                            {
-                                case "svg":
-                                    ne = SvgSvgElement.Parse(xr);
-                                    break;
-
-                                case "g":
-                                    ne = SvgGroupElement.Parse(xr);
-                                    break;
-
-                                case "line":
-                                    ne = SvgLineElement.Parse(xr);
-                                    break;
-
-                                case "rect":
-                                    ne = SvgRectElement.Parse(xr);
-                                    break;
-
-                                case "polygon":
-                                    ne = SvgPolygonElement.Parse(xr);
-                                    break;
-
-                                case "path":
-                                    ne = SvgPathElement.Parse(xr);
-                                    break;
-
-                                default:
-                                    throw new NotSupportedException();
-                            }
+                            var ne = CreateElement(xr);
                             elems.FirstOrDefault()?.AddChild(ne);
 
                             if (!xr.IsEmptyElement)
@@ -150,6 +123,75 @@ namespace Shipwreck.Svg
 
                 throw new InvalidOperationException();
             }
+        }
+        public static async Task<SvgElement> LoadFileAsync(string fileName)
+        {
+            var elems = new Stack<SvgElement>();
+
+            using (var xr = XmlReader.Create(fileName, new XmlReaderSettings() { DtdProcessing = DtdProcessing.Ignore, Async = true }))
+            {
+                while (await xr.ReadAsync())
+                {
+                    switch (xr.NodeType)
+                    {
+                        case XmlNodeType.Element:
+                            var ne = CreateElement(xr);
+                            elems.FirstOrDefault()?.AddChild(ne);
+
+                            if (!xr.IsEmptyElement)
+                            {
+                                elems.Push(ne);
+                            }
+                            break;
+
+                        case XmlNodeType.EndElement:
+                            var le = elems.Pop();
+                            if (!elems.Any())
+                            {
+                                return le;
+                            }
+                            break;
+                    }
+                }
+
+                throw new InvalidOperationException();
+            }
+        }
+
+        private static SvgElement CreateElement(XmlReader xr)
+        {
+            SvgElement ne;
+            switch (xr.Name)
+            {
+                case "svg":
+                    ne = SvgSvgElement.Parse(xr);
+                    break;
+
+                case "g":
+                    ne = SvgGroupElement.Parse(xr);
+                    break;
+
+                case "line":
+                    ne = SvgLineElement.Parse(xr);
+                    break;
+
+                case "rect":
+                    ne = SvgRectElement.Parse(xr);
+                    break;
+
+                case "polygon":
+                    ne = SvgPolygonElement.Parse(xr);
+                    break;
+
+                case "path":
+                    ne = SvgPathElement.Parse(xr);
+                    break;
+
+                default:
+                    throw new NotSupportedException();
+            }
+
+            return ne;
         }
     }
 }
