@@ -67,5 +67,43 @@ namespace Shipwreck.Svg
 
             return sb.ToString();
         }
+
+        public void Translate(float x, float y)
+        {
+            switch (Command)
+            {
+                case 'H':
+                    _Values[0] += x;
+                    break;
+
+                case 'V':
+                    _Values[0] += y;
+                    break;
+
+                case 'M':
+                case 'L':
+                case 'T':
+                    _Values[0] += x;
+                    _Values[1] += y;
+                    break;
+
+                case 'Q':
+                case 'S':
+                    _Values[0] += x;
+                    _Values[1] += y;
+                    _Values[2] += x;
+                    _Values[3] += y;
+                    break;
+
+                case 'C':
+                    _Values[0] += x;
+                    _Values[1] += y;
+                    _Values[2] += x;
+                    _Values[3] += y;
+                    _Values[4] += x;
+                    _Values[5] += y;
+                    break;
+            }
+        }
     }
 }

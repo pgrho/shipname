@@ -65,5 +65,11 @@ namespace Shipwreck.Svg
             element.SetAttributeValue("width", Width);
             element.SetAttributeValue("height", Height);
         }
+
+        public override void Translate(float x, float y)
+        {
+            X += x;
+            Y += y;
+        }
     }
 }

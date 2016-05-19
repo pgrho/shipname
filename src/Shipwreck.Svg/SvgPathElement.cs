@@ -22,7 +22,7 @@ namespace Shipwreck.Svg
             {
             }
 
-            protected override void OnCubicCurveTo(Point start, Point stop, Point controlPoint1, Point controlPoint2)
+            protected override void OnCubicCurveTo(Point start, Point controlPoint1, Point controlPoint2, Point stop)
             {
                 AddPoint(stop);
                 AddPoint(controlPoint1);
@@ -39,7 +39,7 @@ namespace Shipwreck.Svg
                 AddPoint(location);
             }
 
-            protected override void OnQuadraticCurveTo(Point start, Point stop, Point controlPoint)
+            protected override void OnQuadraticCurveTo(Point start, Point controlPoint, Point stop)
             {
                 AddPoint(stop);
                 AddPoint(controlPoint);
@@ -65,23 +65,23 @@ namespace Shipwreck.Svg
 
             protected override void OnClosePath()
             {
-                sb.Append("z ");
+                sb.Append("Z ");
             }
 
-            protected override void OnCubicCurveTo(Point start, Point stop, Point controlPoint1, Point controlPoint2)
+            protected override void OnCubicCurveTo(Point start, Point controlPoint1, Point controlPoint2, Point stop)
             {
                 sb.Append("C ");
-                sb.Append(stop.X);
+                sb.Append(controlPoint1.X.ToString("0.####"));
                 sb.Append(',');
-                sb.Append(stop.Y);
+                sb.Append(controlPoint1.Y.ToString("0.####"));
                 sb.Append(' ');
-                sb.Append(controlPoint1.X);
+                sb.Append(controlPoint2.X.ToString("0.####"));
                 sb.Append(',');
-                sb.Append(controlPoint1.Y);
+                sb.Append(controlPoint2.Y.ToString("0.####"));
                 sb.Append(' ');
-                sb.Append(controlPoint2.X);
+                sb.Append(stop.X.ToString("0.####"));
                 sb.Append(',');
-                sb.Append(controlPoint2.Y);
+                sb.Append(stop.Y.ToString("0.####"));
                 sb.Append(' ');
 
                 Prev = 'C';
@@ -91,9 +91,9 @@ namespace Shipwreck.Svg
             protected override void OnLineTo(Point start, Point stop)
             {
                 sb.Append("L ");
-                sb.Append(stop.X);
+                sb.Append(stop.X.ToString("0.####"));
                 sb.Append(',');
-                sb.Append(stop.Y);
+                sb.Append(stop.Y.ToString("0.####"));
                 sb.Append(' ');
 
                 Prev = 'L';
@@ -103,25 +103,25 @@ namespace Shipwreck.Svg
             protected override void OnMoveTo(Point location)
             {
                 sb.Append("M ");
-                sb.Append(location.X);
+                sb.Append(location.X.ToString("0.####"));
                 sb.Append(',');
-                sb.Append(location.Y);
+                sb.Append(location.Y.ToString("0.####"));
                 sb.Append(' ');
 
                 Prev = 'M';
                 PrevPoint = location;
             }
 
-            protected override void OnQuadraticCurveTo(Point start, Point stop, Point controlPoint)
+            protected override void OnQuadraticCurveTo(Point start, Point controlPoint, Point stop)
             {
                 sb.Append("Q ");
-                sb.Append(stop.X);
+                sb.Append(controlPoint.X.ToString("0.####"));
                 sb.Append(',');
-                sb.Append(stop.Y);
+                sb.Append(controlPoint.Y.ToString("0.####"));
                 sb.Append(' ');
-                sb.Append(controlPoint.X);
+                sb.Append(stop.X.ToString("0.####"));
                 sb.Append(',');
-                sb.Append(controlPoint.Y);
+                sb.Append(stop.Y.ToString("0.####"));
                 sb.Append(' ');
 
                 Prev = 'Q';
@@ -221,6 +221,17 @@ namespace Shipwreck.Svg
             tci.Execute(D);
 
             element.SetAttributeValue("d", tci.ToString());
+        }
+
+        public override void Translate(float x, float y)
+        {
+            if (_D != null)
+            {
+                foreach (var c in _D)
+                {
+                    c.Translate(x, y);
+                }
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ namespace Shipwreck.Svg
     public abstract class SvgDrawingElement : SvgElement
     {
         public string Fill { get; set; }
+
         public string Stroke { get; set; }
 
         public float StrokeWidth { get; set; }
@@ -22,14 +23,8 @@ namespace Shipwreck.Svg
             element.Stroke = ParseColor(reader.GetAttribute("stroke"));
 
             float f;
-            if (float.TryParse(reader.GetAttribute("stroke-width"), out f))
-            {
-                element.StrokeWidth = f;
-            }
-            else
-            {
-                element.StrokeWidth = 1;
-            }
+            float.TryParse(reader.GetAttribute("stroke-width"), out f);
+            element.StrokeWidth = f;
         }
 
         public override void CopyTo(SvgElement other)
@@ -48,7 +43,9 @@ namespace Shipwreck.Svg
 
             element.SetAttributeValue("fill", Fill == "#000000" ? null : Fill ?? "none");
             element.SetAttributeValue("stroke", Stroke == "#000000" ? null : Stroke ?? "none");
-            element.SetAttributeValue("stroke-width", Stroke == null ? (float?)null : StrokeWidth);
+            element.SetAttributeValue("stroke-width", Stroke == null || StrokeWidth <= 0 ? (float?)null : StrokeWidth);
         }
+
+        public abstract void Translate(float x, float y);
     }
 }

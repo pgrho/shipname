@@ -91,5 +91,13 @@ namespace Shipwreck.Svg
             element.SetAttributeValue("x2", X2);
             element.SetAttributeValue("y2", Y2);
         }
+
+        public override void Translate(float x, float y)
+        {
+            X1 += x;
+            Y1 += y;
+            X2 += x;
+            Y2 += y;
+        }
     }
 }

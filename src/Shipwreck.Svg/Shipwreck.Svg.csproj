@@ -41,6 +41,7 @@
     <Compile Include="Rectangle.cs" />
     <Compile Include="SvgDrawingElement.cs" />
     <Compile Include="SvgElement.cs" />
+    <Compile Include="SvgElementExtensions.cs" />
     <Compile Include="SvgGroupElement.cs" />
     <Compile Include="SvgLineElement.cs" />
     <Compile Include="SvgPathCommand.cs" />

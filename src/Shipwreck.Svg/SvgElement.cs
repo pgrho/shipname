@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ using System.Xml.Linq;
 
 namespace Shipwreck.Svg
 {
+    [DebuggerDisplay("<{" + nameof(SvgElement.TagName) + "}>")]
     public abstract class SvgElement : ICloneable
     {
         internal const string XMLNS = "http://www.w3.org/2000/svg";
@@ -85,7 +87,6 @@ namespace Shipwreck.Svg
 
         protected virtual void SetAttributes(XElement element)
         {
-
         }
 
         public static SvgElement Parse(string fileName)

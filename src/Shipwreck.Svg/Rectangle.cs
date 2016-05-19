@@ -68,5 +68,11 @@ namespace Shipwreck.Svg
 
             return new Rectangle(lx, ly, ux - lx, uy - ly);
         }
+
+        public bool IntersectsWith(Rectangle other)
+            => Left <= other.Right
+                && other.Left <= Right
+                && Top <= other.Bottom
+                && other.Top <= Bottom;
     }
 }

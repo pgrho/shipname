@@ -66,64 +66,61 @@ namespace Shipwreck.Svg
                         break;
 
                     case 'C':
-                        np = new Point(cmd[0], cmd[1]);
-                        prevCp = new Point(cmd[4], cmd[5]);
-                        OnCubicCurveTo(p, np, new Point(cmd[2], cmd[3]), prevCp);
+                        cp = new Point(cmd[0], cmd[1]);
+                        prevCp = new Point(cmd[2], cmd[3]);
+                        np = new Point(cmd[4], cmd[5]);
+                        OnCubicCurveTo(p, cp, prevCp, np);
                         p = np;
                         break;
 
                     case 'c':
-                        np = p + new Point(cmd[0], cmd[1]);
-                        prevCp = p + new Point(cmd[4], cmd[5]);
-                        OnCubicCurveTo(p, np, p + new Point(cmd[2], cmd[3]), prevCp);
+                        cp = p + new Point(cmd[0], cmd[1]);
+                        prevCp = p + new Point(cmd[2], cmd[3]);
+                        np = p + new Point(cmd[4], cmd[5]);
+                        OnCubicCurveTo(p, cp, prevCp, np);
                         p = np;
                         break;
 
                     case 'Q':
-                        np = new Point(cmd[0], cmd[1]);
-                        prevCp = new Point(cmd[2], cmd[3]);
-                        OnQuadraticCurveTo(p, np, prevCp);
+                        prevCp = new Point(cmd[0], cmd[1]);
+                        np = new Point(cmd[2], cmd[3]);
+                        OnQuadraticCurveTo(p, prevCp, np);
                         p = np;
                         break;
 
                     case 'q':
-                        np = p + new Point(cmd[0], cmd[1]);
-                        prevCp = p + new Point(cmd[2], cmd[3]);
-                        OnQuadraticCurveTo(p, np, prevCp);
+                        prevCp = p + new Point(cmd[0], cmd[1]);
+                        np = p + new Point(cmd[2], cmd[3]);
+                        OnQuadraticCurveTo(p, prevCp, np);
                         p = np;
                         break;
 
                     case 'S':
-
-                        np = new Point(cmd[0], cmd[1]);
                         cp = prevCp.IsNaN ? p : 2 * p - prevCp;
-                        prevCp = new Point(cmd[2], cmd[3]);
-                        OnCubicCurveTo(p, np, cp, prevCp);
+                        prevCp = new Point(cmd[0], cmd[1]);
+                        np = new Point(cmd[2], cmd[3]);
+                        OnCubicCurveTo(p, cp, prevCp, np);
                         p = np;
                         break;
 
                     case 's':
-
-                        np = p + new Point(cmd[0], cmd[1]);
                         cp = prevCp.IsNaN ? p : 2 * p - prevCp;
-                        prevCp = p + new Point(cmd[2], cmd[3]);
-                        OnCubicCurveTo(p, np, cp, prevCp);
+                        prevCp = p + new Point(cmd[0], cmd[1]);
+                        np = p + new Point(cmd[2], cmd[3]);
+                        OnCubicCurveTo(p, cp, prevCp, np);
                         p = np;
                         break;
-
                     case 'T':
-
-                        np = new Point(cmd[0], cmd[1]);
                         prevCp = prevCp.IsNaN ? p : 2 * p - prevCp;
-                        OnQuadraticCurveTo(p, np, prevCp);
+                        np = new Point(cmd[0], cmd[1]);
+                        OnQuadraticCurveTo(p, prevCp, np);
                         p = np;
                         break;
 
                     case 't':
-
-                        np = p + new Point(cmd[0], cmd[1]);
                         prevCp = prevCp.IsNaN ? p : 2 * p - prevCp;
-                        OnQuadraticCurveTo(p, np, prevCp);
+                        np = p + new Point(cmd[0], cmd[1]);
+                        OnQuadraticCurveTo(p, prevCp, np);
                         p = np;
                         break;
 
@@ -143,9 +140,9 @@ namespace Shipwreck.Svg
 
         protected abstract void OnLineTo(Point start, Point stop);
 
-        protected abstract void OnCubicCurveTo(Point start, Point stop, Point controlPoint1, Point controlPoint2);
+        protected abstract void OnCubicCurveTo(Point start, Point controlPoint1, Point controlPoint2, Point stop);
 
-        protected abstract void OnQuadraticCurveTo(Point start, Point stop, Point controlPoint);
+        protected abstract void OnQuadraticCurveTo(Point start, Point controlPoint, Point stop);
 
         protected abstract void OnClosePath();
     }
