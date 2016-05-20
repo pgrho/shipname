@@ -133,11 +133,11 @@ namespace Shipwreck.ShipNameFont.Services.Controllers
 
                 if (HttpContext.Current.IsDebuggingEnabled)
                 {
-                    p = new Uri(new Uri(HttpContext.Current.Server.MapPath("/")), $"../../jmsdf/{cc}.svg").LocalPath;
+                    p = new Uri(new Uri(HttpContext.Current.Server.MapPath("~/")), $"../../jmsdf/{cc}.svg").LocalPath;
                 }
                 else
                 {
-                    p = HttpContext.Current.Server.MapPath($"/Content/jmsdf/{cc}.svg");
+                    p = HttpContext.Current.Server.MapPath($"~/Content/jmsdf/{cc}.svg");
                 }
                 var e = await SvgElement.LoadFileAsync(p);
 
