@@ -1,4 +1,5 @@
-﻿using Shipwreck.Svg;
+﻿using Shipwreck.ShipNameFont.Services.Formatting;
+using Shipwreck.Svg;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -106,12 +107,33 @@ namespace Shipwreck.ShipNameFont.Services.Controllers
             return value;
         }
 
-        [Route("image/{name}.svg")]
-        public async Task<FormattedContentResult<SvgSvgElement>> GetImage(string name)
+        [Route("image/{type}/{text}.svg")]
+        public async Task<FormattedContentResult<SvgSvgElement>> GetSvg(string type, string text)
+        {
+            var svg = await GetImage(type, text);
+            if (svg == null)
+            {
+                throw new HttpException(404, "指定されたフォントは存在しません。");
+            }
+            return Content(System.Net.HttpStatusCode.OK, svg, new SvgMediaTypeFormatter());
+        }
+
+        [Route("image/{type}/{text}.png")]
+        public async Task<FormattedContentResult<SvgSvgElement>> GetPng(string type, string text)
+        {
+            var svg = await GetImage(type, text);
+            if (svg == null)
+            {
+                throw new HttpException(404, "指定されたフォントは存在しません。");
+            }
+            return Content(System.Net.HttpStatusCode.OK, svg, new PngMediaTypeFormatter());
+        }
+
+        public async Task<SvgSvgElement> GetImage(string type, string text)
         {
             SvgSvgElement elem = null;
 
-            foreach (var c in name)
+            foreach (var c in text)
             {
                 char cc;
 
@@ -133,12 +155,18 @@ namespace Shipwreck.ShipNameFont.Services.Controllers
 
                 if (HttpContext.Current.IsDebuggingEnabled)
                 {
-                    p = new Uri(new Uri(HttpContext.Current.Server.MapPath("~/")), $"../../jmsdf/{cc}.svg").LocalPath;
+                    p = new Uri(new Uri(HttpContext.Current.Server.MapPath("~/")), $"../../{type}/{cc}.svg").LocalPath;
                 }
                 else
                 {
-                    p = HttpContext.Current.Server.MapPath($"~/Content/jmsdf/{cc}.svg");
+                    p = HttpContext.Current.Server.MapPath($"~/Content/{type}/{cc}.svg");
                 }
+
+                if (!File.Exists(p))
+                {
+                    return null;
+                }
+
                 var e = await SvgElement.LoadFileAsync(p);
 
                 if (elem == null)
@@ -194,14 +222,14 @@ namespace Shipwreck.ShipNameFont.Services.Controllers
                 }
             }
             var cb = elem.ChildBounds;
-            elem.Width = cb.Width;
-            elem.Height = cb.Height;
+            elem.Width = (float)Math.Ceiling((double)cb.Width);
+            elem.Height = (float)Math.Ceiling((double)cb.Height);
             foreach (var ce in elem.Items)
             {
                 (ce as SvgDrawingElement).Translate(-cb.Left, -cb.Top);
             }
 
-            return Content(System.Net.HttpStatusCode.OK, elem, new SvgMediaTypeFormatter());
+            return elem;
         }
     }
 }
