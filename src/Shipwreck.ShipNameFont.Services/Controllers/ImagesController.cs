@@ -790,48 +790,24 @@ namespace Shipwreck.ShipNameFont.Services.Controllers
 
         #endregion 文字
 
-        [Route("image/{type}/{text}.svg")]
-        public async Task<FormattedContentResult<SvgSvgElement>> GetSvgAsync(string type, string text)
-            => await GetImageAsync(type, text, new SvgMediaTypeFormatter());
+        public Task<FormattedContentResult<SvgSvgElement>> GetUnknownTypeAsync(string type, string fileName) 
+            => GetUnknownTypeAsync(Path.GetFileNameWithoutExtension(fileName), Path.GetExtension(fileName));
 
-        [Route("image/{type}/{text}.png")]
-        public async Task<FormattedContentResult<SvgSvgElement>> GetPngAsync(string type, string text)
-            => await GetImageAsync(type, text, new PngMediaTypeFormatter());
-
-        [Route("image/{type}/{text}")]
-        public async Task<FormattedContentResult<SvgSvgElement>> GetUnknownTypeAsync(string type, string text)
+        public async Task<FormattedContentResult<SvgSvgElement>> GetUnknownTypeAsync(string type, string text, string extension)
         {
             MediaTypeFormatter formatter = null;
-            var ofn = GetOriginalFileName();
 
-            if (ofn != null)
+            switch (extension?.ToLowerInvariant().TrimStart('.'))
             {
-                switch (Path.GetExtension(ofn)?.ToLowerInvariant())
-                {
-                    case ".png":
-                        formatter = new PngMediaTypeFormatter();
-                        break;
-                        //case ".svg":
-                        //    formatter = new SvgMediaTypeFormatter();
-                        //    break;
-                }
+                case "png":
+                    formatter = new PngMediaTypeFormatter();
+                    break;
+                case "svg":
+                    formatter = new SvgMediaTypeFormatter();
+                    break;
             }
 
-            return await GetImageAsync(type, ofn != null ? Path.GetFileNameWithoutExtension(ofn) : text, formatter ?? new SvgMediaTypeFormatter());
-        }
-
-        private string GetOriginalFileName()
-        {
-            var ou = HttpContext.Current.Request.Headers["X-Original-URL"];
-
-            if (string.IsNullOrEmpty(ou))
-            {
-                return null;
-            }
-
-            var uri = new Uri(HttpContext.Current.Request.Url, ou);
-
-            return Uri.UnescapeDataString(Path.GetFileName(uri.AbsolutePath));
+            return await GetImageAsync(type, text, formatter ?? new SvgMediaTypeFormatter());
         }
 
         private async Task<FormattedContentResult<SvgSvgElement>> GetImageAsync(string type, string text, MediaTypeFormatter formatter)
@@ -839,16 +815,6 @@ namespace Shipwreck.ShipNameFont.Services.Controllers
             var svg = await GetImageAsync(type, text, 0.4f);
             if (svg == null)
             {
-                var ofn = GetOriginalFileName();
-
-                if (ofn != null)
-                {
-                    var ot = Path.GetFileNameWithoutExtension(ofn); if (ot != text)
-                    {
-                        return await GetImageAsync(type, ot, formatter);
-                    }
-                }
-
                 HttpContext.Current.Request.SaveAs(Path.GetTempFileName(), true);
                 throw new HttpException(404, "指定されたフォントは存在しません。");
             }

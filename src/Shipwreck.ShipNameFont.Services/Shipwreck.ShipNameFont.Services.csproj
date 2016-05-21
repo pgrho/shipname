@@ -173,6 +173,9 @@
     <Content Include="..\..\jmsdf\*.svg">
       <Link>Content\jmsdf\%(FileName).svg</Link>
     </Content>
+    <Content Include="..\..\usn\*.svg">
+      <Link>Content\usn\%(FileName).svg</Link>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shipwreck.Svg\Shipwreck.Svg.csproj">

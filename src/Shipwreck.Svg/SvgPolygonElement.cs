@@ -101,7 +101,7 @@ namespace Shipwreck.Svg
                 if (value?.Count > 0)
                 {
                     var l = Points;
-                    foreach (var v in Points)
+                    foreach (var v in value)
                     {
                         l.Add(v);
                     }
